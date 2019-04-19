@@ -7,6 +7,7 @@
 import errno
 import optparse as op
 import os
+import re
 import subprocess as sp
 import sys
 import time
@@ -175,6 +176,8 @@ def run_import(git, srcdir, opts):
         for fn in fnames:
             fpath = os.path.join(path, fn)
             fpath = normalize_path(fpath)
+            if re.search(opts.filter, fpath):
+                continue
             gpath = gitpath(os.path.relpath(fpath, start=srcdir))
             add_file(pipe, fpath, gpath)
     if opts.nojekyll:
@@ -212,7 +215,9 @@ def options():
             help='Use the shell when invoking Git. [%default]'),
         op.make_option('-l', '--follow-links', dest='followlinks',
             default=False, action='store_true',
-            help='Follow symlinks when adding files. [%default]')
+            help='Follow symlinks when adding files. [%default]'),
+        op.make_option('--filter', dest='filter', default=r'',
+            help='Filter files you do not want to add. [%default]'),
     ]
 
 
